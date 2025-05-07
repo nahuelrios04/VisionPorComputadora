@@ -40,6 +40,6 @@ def adivinar(Maxtrys):
         except ValueError:
             print("Por favor, ingresa un número válido.")
     
-    print(f"\n¡Lo siento! Has superado el número máximo de trys ({Maxtrys}).")
-    print(f"El número secreto era: {SecretNumber}")
+    print(f"\n¡GAME OVER! Has superado el número máximo de trys ({Maxtrys}).")
+    print(f"El número secreto era: {SecretNumber}.")
 adivinar(int(input("Ingrese numero de intentos: ")))

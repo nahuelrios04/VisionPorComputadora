@@ -9,8 +9,8 @@ rx, ry = -1, -1
 img = cv2.imread('pepsi.png')  
 img_original = img.copy()
 
-def euclidean_transform(img_section, angle_deg, tx, ty):
-    angle_rad = m.radians(angle_deg)
+def euclidean_transform(img_section, angle_deg, tx, ty): #traslada y rota
+    angle_rad = m.radians(angle_deg) #transformo el angulo en radianes porque le pedi al usuario en deg
     cos_a = m.cos(angle_rad)
     sin_a = m.sin(angle_rad)
 
@@ -20,9 +20,11 @@ def euclidean_transform(img_section, angle_deg, tx, ty):
         [-sin_a, cos_a, ty]
     ], dtype=n.float32)
 
-    h, w = img_section.shape[:2]
-    cx, cy = w / 2, h / 2
-    new_cx, new_cy = 2 * w, 2 * hransformed = cv2.warpAffine(img_section, M, (4*w, 4*h))
+    h, w = img_section.shape[:2] #shape = (alto, ancho, canales) me devuelve una tupla pero con el :2 solo los dos primeros alto y ancho
+    #cx, cy = w / 2, h / 2
+    #new_cx, new_cy = 2 * w, 2 * h 
+    transformed = cv2.warpAffine(img_section, M, (4*w, 4*h)) #Aplico LA MTRIZ M A LA SECCION - EL TAMAÑP DE SALIDA ES 4 VECES MAS GRANDE PARA ASEGURAR QUE NADA QUEDE AFUERA Esto asegura que nada quede recortado si la rotación desplaza partes fuera del área original.
+
     return transformed
 
 
@@ -45,7 +47,7 @@ def draw_rectangle(event, x, y, flags, param):
 
 cv2.namedWindow('image')
 cv2.setMouseCallback('image', draw_rectangle)
-
+###############################################################################LOOP ##############################33
 while True:
     cv2.imshow('image', img)
     k = cv2.waitKey(1) & 0xFF
@@ -55,17 +57,24 @@ while True:
         ix, iy, rx, ry = -1, -1, -1, -1
         print("Imagen restaurada.")
 
-    elif k == ord('e'):
+    elif k == ord('e'): #aca activo la transformada
         if ix != -1 and iy != -1 and rx != -1 and ry != -1:
             x1, y1 = min(ix, rx), min(iy, ry)
             x2, y2 = max(ix, rx), max(iy, ry)
-            roi = img_original[y1:y2, x1:x2]
+            roi = img_original[y1:y2, x1:x2] 
+            #ROI ES LA IMAGEN RECORTADA RECORTED ORIGINAL IMAGE #################
+
+
+
+############### LE PIDO AL USUARIO LOS DATOS #######################
 
             angle = float(input("Ángulo de rotación (grados): "))
             tx = float(input("Traslación en X: "))
             ty = float(input("Traslación en Y: "))
 
-            transformed_roi = euclidean_transform(roi, angle, tx, ty)
+######################################### LLAMO A LA FUNCION DE TRANSFORMADA ECLUDIANA DECLARADA AL INICIO ####################################33
+
+            transformed_roi = euclidean_transform(roi, angle, tx, ty) #llamo a la funcion
             cv2.imwrite("transformada.jpg", transformed_roi)
             print("Imagen transformada guardada como 'transformada.jpg'")
 

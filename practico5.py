@@ -13,16 +13,20 @@ def euclidean_transform(img_section, angle_deg, tx, ty): #traslada y rota
     angle_rad = m.radians(angle_deg) #transformo el angulo en radianes porque le pedi al usuario en deg
     cos_a = m.cos(angle_rad)
     sin_a = m.sin(angle_rad)
-
-    # Matriz de transformación (2x3)
-    M = n.array([
-        [cos_a, sin_a, tx],
-        [-sin_a, cos_a, ty]
-    ], dtype=n.float32)
+ 
 
     h, w = img_section.shape[:2] #shape = (alto, ancho, canales) me devuelve una tupla pero con el :2 solo los dos primeros alto y ancho
-    #cx, cy = w / 2, h / 2
-    #new_cx, new_cy = 2 * w, 2 * h 
+
+    # Calcular posición centrada inicial
+    start_x = (4*w - w) // 2 + tx
+    start_y = (4*h - h) // 2 + ty
+
+    # Matriz de transformación
+    M = n.array([
+        [cos_a, sin_a, start_x],
+        [-sin_a, cos_a, start_y]
+    ], dtype=n.float32)
+    
     transformed = cv2.warpAffine(img_section, M, (4*w, 4*h)) #Aplico LA MTRIZ M A LA SECCION - EL TAMAÑP DE SALIDA ES 4 VECES MAS GRANDE PARA ASEGURAR QUE NADA QUEDE AFUERA Esto asegura que nada quede recortado si la rotación desplaza partes fuera del área original.
 
     return transformed
@@ -50,13 +54,16 @@ cv2.setMouseCallback('image', draw_rectangle)
 ###############################################################################LOOP ##############################33
 while True:
     cv2.imshow('image', img)
-    k = cv2.waitKey(1) & 0xFF
+    k = cv2.waitKey(20) & 0xFF
 
     if k == ord('r'):
         img = img_original.copy()
         ix, iy, rx, ry = -1, -1, -1, -1
         print("Imagen restaurada.")
 
+    elif k == ord('q') or k == 27:  # 'q' o ESC
+        print("Saliendo del programa...")
+        break
     elif k == ord('e'): #aca activo la transformada
         if ix != -1 and iy != -1 and rx != -1 and ry != -1:
             x1, y1 = min(ix, rx), min(iy, ry)
@@ -77,8 +84,6 @@ while True:
             transformed_roi = euclidean_transform(roi, angle, tx, ty) #llamo a la funcion
             cv2.imwrite("transformada.jpg", transformed_roi)
             print("Imagen transformada guardada como 'transformada.jpg'")
-
-    elif k == ord('q'):
-        break
+            
 
 cv2.destroyAllWindows()

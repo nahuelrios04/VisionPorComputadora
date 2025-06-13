@@ -9,7 +9,12 @@ rx, ry = -1, -1
 img = cv2.imread('pepsi.png')  
 img_original = img.copy()
 
-def euclidean_transform(img_section, angle_deg, tx, ty): #traslada y rota
+def euclidean_transform(img_section):
+    angle_deg = float(input("Ángulo de rotación (grados): "))
+    tx = float(input("Traslación en X: "))
+    ty = float(input("Traslación en Y: "))
+
+    #traslada y rota
     angle_rad = m.radians(angle_deg) #transformo el angulo en radianes porque le pedi al usuario en deg
     cos_a = m.cos(angle_rad)
     sin_a = m.sin(angle_rad)
@@ -53,15 +58,15 @@ cv2.namedWindow('image')
 cv2.setMouseCallback('image', draw_rectangle)
 ###############################################################################LOOP ##############################33
 while True:
+    flag=0
     cv2.imshow('image', img)
-    k = cv2.waitKey(20) & 0xFF
-
+    k = cv2.waitKey(10) 
     if k == ord('r'):
         img = img_original.copy()
         ix, iy, rx, ry = -1, -1, -1, -1
         print("Imagen restaurada.")
 
-    elif k == ord('q') or k == 27:  # 'q' o ESC
+    elif k == ord('q') or flag==1: 
         print("Saliendo del programa...")
         break
     elif k == ord('e'): #aca activo la transformada
@@ -70,20 +75,17 @@ while True:
             x2, y2 = max(ix, rx), max(iy, ry)
             roi = img_original[y1:y2, x1:x2] 
             #ROI ES LA IMAGEN RECORTADA RECORTED ORIGINAL IMAGE #################
-
-
+   
 
 ############### LE PIDO AL USUARIO LOS DATOS #######################
 
-            angle = float(input("Ángulo de rotación (grados): "))
-            tx = float(input("Traslación en X: "))
-            ty = float(input("Traslación en Y: "))
 
 ######################################### LLAMO A LA FUNCION DE TRANSFORMADA ECLUDIANA DECLARADA AL INICIO ####################################33
 
-            transformed_roi = euclidean_transform(roi, angle, tx, ty) #llamo a la funcion
+            transformed_roi = euclidean_transform(roi) #llamo a la funcion
             cv2.imwrite("transformada.jpg", transformed_roi)
+            img = transformed_roi
             print("Imagen transformada guardada como 'transformada.jpg'")
-            
+            flag==1
 
 cv2.destroyAllWindows()

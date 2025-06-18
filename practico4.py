@@ -32,7 +32,7 @@ def draw(event, x, y, flags, param): #esta funcion solo para eventos del mouse y
         rx, ry = x, y #setea final de seleccion 
         cv2.rectangle(img, (ix, iy), (x, y), (0, 255, 0), 2)
 
-cv2.namedWindow('EDICION by utn')
+cv2.namedWindow('image')
 cv2.setMouseCallback('image', draw)
 
 #######################################NUESTRO MAIN ##########################################################################

@@ -4,7 +4,7 @@ import numpy as np
 drawing = False     #true if mouse is pressed
 ix, iy = -1, -1
 
-original = cv2.imread("burguer.jpeg", cv2.IMREAD_COLOR)
+original = cv2.imread("fernet.jpeg", cv2.IMREAD_COLOR)
 coca = cv2.imread("coca.jpeg", cv2.IMREAD_COLOR)
 cocaTrans = coca.copy()
 
@@ -13,6 +13,7 @@ cropped = original.copy()
 buffer =  original.copy()
 imgRotada = original.copy()
 imgTrasladada = original.copy()
+nueva = 0
 
 angle = 0   #Rotación
 tx = 0      #Traslación en X
@@ -85,10 +86,11 @@ def select_points(event, x, y, flags, param):
             image2_fg = cv2.bitwise_and(cocaTrans, mask) #incrusto la nueva sobre lo faltante
 
             #combino
-            clone = cv2.add(image1_bg, image2_fg) 
+            clone = (cv2.add(image1_bg, image2_fg)).copy() 
+            cv2.imshow('image',clone)
             aPresionada = 0
             points.clear()
-            cv2.destroyAllWindows()
+
         else:
             print("Te faltan seleccionar " + str(3- len(points))+ " puntos")
 
@@ -128,15 +130,12 @@ print("- s: Rotar, trasladar y escalar\n")
 print("- a: Transformación afín\n")
 
 while(1):
+    cv2.imshow('image', clone)
     
     if aPresionada:
         cv2.setMouseCallback('image', select_points)  # setMouseCallback permite ejecutar una funcion en la imagen cada vez que lea un evento de mouse.
         
     
-    else:
-        cv2.setMouseCallback('image', draw_rectangle) 
-
-    cv2.imshow('image', clone)
     k = cv2.waitKey(1) & 0xFF
 
     if k == ord('r'):

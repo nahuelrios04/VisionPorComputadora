@@ -14,33 +14,50 @@ print("Seleccione r para restaurar en caso de no estar conforme con su seleccion
 print("Seleccione q para salir del programa.")
 print("Seleccione s para aplicar transformada + escala.")
 def euclidean_transform(img_section):
+    # Obtener parámetros del usuario
     angle_deg = float(input("Ángulo de rotación (grados): "))
-    tx = float(input("Traslación en X: "))
-    ty = float(input("Traslación en Y: "))
-    s = float(input("Escala(s): "))
+    tx = float(input("Traslación en X (píxeles): "))
+    ty = float(input("Traslación en Y (píxeles): "))
+    scale = float(input("Factor de escala: "))
     
+    # Convertir ángulo a radianes
+    angle_rad = n.radians(angle_deg)
+    cos_a = n.cos(angle_rad)
+    sin_a = n.sin(angle_rad)
+    
+    # Dimensiones originales
+    h, w = img_section.shape[:2]
+    
+    # Calcular nuevas dimensiones después de rotación y escala
+    new_w = int((w * abs(cos_a) + h * abs(sin_a))*scale)
+    new_h = int((w * abs(sin_a) + h * abs(cos_a))*scale)
 
-    #traslada y rota
-    angle_rad = m.radians(angle_deg) #transformo el angulo en radianes porque le pedi al usuario en deg
-    cos_a = m.cos(angle_rad)
-    sin_a = m.sin(angle_rad)
- 
-
-    h, w = img_section.shape[:2] #shape = (alto, ancho, canales) me devuelve una tupla pero con el :2 solo los dos primeros alto y ancho
-
-    # Calcular posición centrada inicial
-    start_x = (s*w - w) // 2 + tx
-    start_y = (s*h - h) // 2 + ty
-
-    # Matriz de transformación
-    newW = int((w * abs(cos_a) + h * abs(sin_a)) * s)
-    newH = 2*int((w * abs(sin_a) + h * abs(cos_a)) * s)
-    M = n.array([
-        [s*cos_a, s*sin_a, (newW - w * s*cos_a + h * s*sin_a)/2 + tx],
-        [-s*sin_a, s*cos_a, (newH + w * s*sin_a - h * s*cos_a)/2 + ty]
-    ], dtype=n.float32)
-    transformed = cv2.warpAffine(img_section, M, (4*h,4*w)) #Aplico LA MTRIZ M A LA SECCION - EL TAMAÑP DE SALIDA ES 4 VECES MAS GRANDE PARA ASEGURAR QUE NADA QUEDE AFUERA Esto asegura que nada quede recortado si la rotación desplaza partes fuera del área original.
-
+    # Matriz de transformación compuesta (rotación + escala + traslación)
+    # 1. Matriz de rotación y escala
+    rotation_matrix = n.array([
+        [scale * cos_a, scale * sin_a, 0],
+        [-scale * sin_a, scale * cos_a, 0]
+    ])
+    
+    # 2. Ajustar para centrar la imagen
+    # Calculamos cómo se mueve el centro con la rotación
+    center_x = w / 2
+    center_y = h / 2
+    new_center_x = (rotation_matrix[0,0] * center_x + rotation_matrix[0,1] * center_y)
+    new_center_y = (rotation_matrix[1,0] * center_x + rotation_matrix[1,1] * center_y)
+    
+    # 3. Añadir traslación para centrar + traslación del usuario
+    rotation_matrix[0,2] = (new_w / 2) - new_center_x + tx
+    rotation_matrix[1,2] = (new_h / 2) - new_center_y + ty
+    
+    # Aplicar transformación
+    transformed = cv2.warpAffine(
+        img_section, 
+        rotation_matrix, 
+        (new_w, new_h),  # Tamaño de salida calculado
+        flags=cv2.INTER_LINEAR,
+        borderMode=cv2.BORDER_CONSTANT,
+        borderValue=(255, 255, 255)  ) 
     return transformed
 
 

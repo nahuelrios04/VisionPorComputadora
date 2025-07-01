@@ -9,6 +9,10 @@ rx, ry = -1, -1
 img = cv2.imread('pepsi.png')  
 img_original = img.copy()
 
+print("Seleccione una porcion de la imagen con el mouse..")
+print("Seleccione r para restaurar en caso de no estar conforme con su seleccion.")
+print("Seleccione q para salir del programa.")
+print("Seleccione s para aplicar transformada + escala.")
 def euclidean_transform(img_section):
     angle_deg = float(input("Ángulo de rotación (grados): "))
     tx = float(input("Traslación en X: "))
@@ -35,7 +39,7 @@ def euclidean_transform(img_section):
         [s*cos_a, s*sin_a, (newW - w * s*cos_a + h * s*sin_a)/2 + tx],
         [-s*sin_a, s*cos_a, (newH + w * s*sin_a - h * s*cos_a)/2 + ty]
     ], dtype=n.float32)
-    transformed = cv2.warpAffine(img_section, M, (newW,newH)) #Aplico LA MTRIZ M A LA SECCION - EL TAMAÑP DE SALIDA ES 4 VECES MAS GRANDE PARA ASEGURAR QUE NADA QUEDE AFUERA Esto asegura que nada quede recortado si la rotación desplaza partes fuera del área original.
+    transformed = cv2.warpAffine(img_section, M, (4*h,4*w)) #Aplico LA MTRIZ M A LA SECCION - EL TAMAÑP DE SALIDA ES 4 VECES MAS GRANDE PARA ASEGURAR QUE NADA QUEDE AFUERA Esto asegura que nada quede recortado si la rotación desplaza partes fuera del área original.
 
     return transformed
 

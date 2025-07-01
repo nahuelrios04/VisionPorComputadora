@@ -9,6 +9,10 @@ rx, ry = -1, -1
 img = cv2.imread('pepsi.png')  
 img_original = img.copy()
 
+print("Seleccione una porcion de la imagen con el mouse..")
+print("Seleccione r para restaurar en caso de no estar conforme con su seleccion.")
+print("Seleccione q para salir del programa.")
+print("Seleccione e para aplicar transformada.")
 def euclidean_transform(img_section):
     angle_deg = float(input("Ángulo de rotación (grados): "))
     tx = float(input("Traslación en X: "))
@@ -32,7 +36,7 @@ def euclidean_transform(img_section):
         [-sin_a, cos_a, start_y]
     ], dtype=n.float32)
     
-    transformed = cv2.warpAffine(img_section, M, (4*w, 4*h)) #Aplico LA MTRIZ M A LA SECCION - EL TAMAÑP DE SALIDA ES 4 VECES MAS GRANDE PARA ASEGURAR QUE NADA QUEDE AFUERA Esto asegura que nada quede recortado si la rotación desplaza partes fuera del área original.
+    transformed = cv2.warpAffine(img_section, M, (5*w, 5*h)) #Aplico LA MTRIZ M A LA SECCION - EL TAMAÑP DE SALIDA ES 4 VECES MAS GRANDE PARA ASEGURAR QUE NADA QUEDE AFUERA Esto asegura que nada quede recortado si la rotación desplaza partes fuera del área original.
 
     return transformed
 
@@ -76,8 +80,6 @@ while True:
             roi = img_original[y1:y2, x1:x2] 
             #ROI ES LA IMAGEN RECORTADA RECORTED ORIGINAL IMAGE #################
    
-
-############### LE PIDO AL USUARIO LOS DATOS #######################
 
 
 ######################################### LLAMO A LA FUNCION DE TRANSFORMADA ECLUDIANA DECLARADA AL INICIO ####################################33

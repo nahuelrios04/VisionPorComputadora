@@ -67,11 +67,11 @@ def mouse_measure(event, x, y, flags, param):
                 cv2.line(warped, measure_pts[0], measure_pts[1], (0, 255, 255), 2)
                 mid_x = (measure_pts[0][0] + measure_pts[1][0]) // 2
                 mid_y = (measure_pts[0][1] + measure_pts[1][1]) // 2
-                cv2.putText(warped, f"{distance:.3f} m", (mid_x, mid_y), 
+                cv2.putText(warped, f"{distance:.5f} m", (mid_x, mid_y), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
                 
                 cv2.imshow("Imagen Rectificada", warped)
-                print(f"Distancia medida: {distance:.3f} metros")
+                print(f"Distancia medida: {distance:.5f} metros")
         else:
             # Reiniciar medición si ya hay 2 puntos
             measure_pts = [(x, y)]
@@ -80,21 +80,23 @@ def mouse_measure(event, x, y, flags, param):
             cv2.imshow("Imagen Rectificada", warped)
 
 def rectificar_imagen():
-    """Realiza la rectificación perspectiva"""
-    global img, points, warped, scale
-    
+    """Realiza la rectificación perspectiva con ancho automático"""
+    global img, points, warped, scale, real_width, real_height
+
     if len(points) != 4:
         print("Error: Se necesitan exactamente 4 puntos")
         return None, None
-    
+
     # Ordena puntos
     ordered_points = ordenaPuntos(points)
+    width_px = np.linalg.norm(np.array(ordered_points[1]) - np.array(ordered_points[0]))
     
-    # Define rectángulo destino (conservando relación de aspecto)
-    aspect_ratio = real_width / real_height
-    rect_width = int(800)  # Ancho en píxeles de la imagen rectificada
-    rect_height = int(rect_width / aspect_ratio)
+    # Calcula la escala (píxeles por metro)
+    scale = width_px / real_width
     
+    # Define el tamaño de la imagen rectificada basado en la escala y dimensiones reales
+    rect_width = int(real_width * scale)  # Ancho calculado automáticamente
+    rect_height = int(real_height * scale)  # Alto calculado automáticamente
     dst_pts = np.array([
         [0, 0],                         # A (sup-izq)
         [rect_width - 1, 0],             # B (sup-der)

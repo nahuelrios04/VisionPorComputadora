@@ -9,26 +9,21 @@ warped = None        # Imagen rectificada
 scale = None         # Factor de escala (píxeles/metro)
 
 def ordenaPuntos(points):
-    """Ordena puntos en sentido horario: A (sup-izq), B (sup-der), C (inf-der), D (inf-izq)"""
-    # Convertir a array numpy para facilitar cálculos
     pts = np.array(points, dtype="float32")
     
     # Ordenar por coordenada x (izquierda a derecha)
     x_sorted = pts[np.argsort(pts[:, 0]), :]
     
-    # Separar en puntos izquierdos y derechos
     left_pts = x_sorted[:2]
     right_pts = x_sorted[2:]
     
-    # Ordenar puntos izquierdos (A arriba, D abajo)
     left_pts = left_pts[np.argsort(left_pts[:, 1])]
     A = left_pts[0]  # Superior izquierdo
-    D = left_pts[1]  # Inferior izquierdo
+    D = left_pts[1]  # Inferior derecho 
     
-    # Ordenar puntos derechos (B arriba, C abajo)
     right_pts = right_pts[np.argsort(right_pts[:, 1])]
     B = right_pts[0]  # Superior derecho
-    C = right_pts[1]  # Inferior derecho
+    C = right_pts[1]  # Inferior izquierdo
     
     return [A, B, C, D]
 
@@ -46,16 +41,13 @@ def mouse_selection(event, x, y, flags, param):
         cv2.imshow("Seleccionar 4 puntos (A, B, C, D)", img)
 
 def mouse_measure(event, x, y, flags, param):
-    """Callback para medición de distancias"""
     global measure_pts, warped, scale
-    
     if event == cv2.EVENT_LBUTTONDOWN:
         if len(measure_pts) < 2:
             measure_pts.append((x, y))
             cv2.circle(warped, (x, y), 5, (0, 0, 255), -1)
             
             if len(measure_pts) == 2:
-                # Calcula distancia en metros
                 dx_px = measure_pts[1][0] - measure_pts[0][0]
                 dy_px = measure_pts[1][1] - measure_pts[0][1]
                 
@@ -80,7 +72,6 @@ def mouse_measure(event, x, y, flags, param):
             cv2.imshow("Imagen Rectificada", warped)
 
 def rectificar_imagen():
-    """Realiza la rectificación perspectiva con ancho automático"""
     global img, points, warped, scale, real_width, real_height
 
     if len(points) != 4:
@@ -118,7 +109,6 @@ def rectificar_imagen():
 def main():
     global img, points, warped, scale, real_width, real_height
     
-    # Cargar imagen
     img_path = "jtag.png"  # Cambiar por tu imagen
     img = cv2.imread(img_path)
     
@@ -128,7 +118,6 @@ def main():
         print("Error: No se pudo cargar la imagen")
         return
     
-    # Paso 1: Selección de puntos
     cv2.namedWindow("Seleccionar 4 puntos (A, B, C, D)", cv2.WINDOW_NORMAL)
     cv2.imshow("Seleccionar 4 puntos (A, B, C, D)", img)
     cv2.setMouseCallback("Seleccionar 4 puntos (A, B, C, D)", mouse_selection)
@@ -143,7 +132,6 @@ def main():
         print("Error: Debes seleccionar exactamente 4 puntos")
         return
     
-    # Paso 2: Rectificación
     warped, scale = rectificar_imagen()
     if warped is None:
         return

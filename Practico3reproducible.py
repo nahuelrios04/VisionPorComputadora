@@ -14,12 +14,12 @@ def convert_to_vlc_compatible(input_path):
     width, height = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) , int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-
+    delay = int(1000/fps) if fps >0 else 33 
     # Archivo temporal de trabajo
     temp_file = 'temp_output.avi'
     final_file = 'MarioSalida.mp4'
 
-    out = cv2.VideoWriter(temp_file, fourcc,fps, (width, height),isColor=True)
+    out = cv2.VideoWriter(temp_file, fourcc,fps, (width, height),isColor=False)
 
     while True:
         ret, frame = cap.read()
@@ -30,6 +30,10 @@ def convert_to_vlc_compatible(input_path):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
         out.write(gray_bgr)
+        cv2.imshow('Muestra del video en grises', gray_bgr) 
+        if cv2.waitKey(delay) == ord('q'): 
+            break
+        
 
     cap.release()
     out.release()
@@ -41,7 +45,6 @@ def convert_to_vlc_compatible(input_path):
             '-c:v', 'libx264',
             '-preset', 'fast',
             '-crf', '23',
-            '-pix_fmt', 'yuv420p',
             final_file
         ], check=True)
         print(f"Video convertido con éxito: {final_file}")

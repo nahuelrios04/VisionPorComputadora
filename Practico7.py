@@ -63,10 +63,9 @@ def select_points(event, x, y, flags, param):
 
         if len(points) == 3:
 
-            # Realizamos la transformación y obtenemos la matriz correspondiente de transformación.
+######################################################################################## llamo a la funcion matriz TRANSFORMADA
             M = affine_transform(dst_points, points)
 
-            # le realizamos la transformación a la imagen2 (coca)
             cocaTrans = cv2.warpAffine(coca, M, (clone.shape[1], clone.shape[0]))
             
             # Necesitamos convertir los valores del vector points en tipo np para poder obtener el 4to punto faltante por álgebra.
@@ -82,6 +81,7 @@ def select_points(event, x, y, flags, param):
             cv2.fillConvexPoly(mask, np.int32([points[0], points[1], cuartoPto, points[2]]), (255, 255, 255))
 
             mask_inv = cv2.bitwise_not(mask) 
+            
             image1_bg = cv2.bitwise_and(clone, mask_inv) #Conservo todo menos el poligono 
             image2_fg = cv2.bitwise_and(cocaTrans, mask) #incrusto la nueva sobre lo faltante
 
@@ -116,8 +116,9 @@ def translate(image, x, y):
 
 def affine_transform(src_points, dst_points):
     global aPresionada
-    assert len(src_points) == 3 and len(dst_points) == 3   #Assert checkea que las condiciones que se le pasan sean verdaderas, sino el programa se detiene y tira un AssertionError.
+    assert len(src_points) == 3 and len(dst_points) == 3   
     aPresionada = 0
+################################################################## TRANSFORMADA ##############################################
     return cv2.getAffineTransform(np.float32(src_points), np.float32(dst_points))   #Retornamos la matriz de transformación (2x3)
 
 cv2.namedWindow('image')

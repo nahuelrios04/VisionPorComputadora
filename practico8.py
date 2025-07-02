@@ -42,16 +42,12 @@ def ordenaPuntos(points):
 
 
 def rectificar(img, p_origen):
-    # p_origen [A,B,C,D]
     p_origen = np.float32(p_origen)
 
-    # Diferencia de puntos BA, DC, CA y DB
     difBA = p_origen[1] - p_origen[0]
     difDC = p_origen[3] - p_origen[2]
     difCA = p_origen[2] - p_origen[0]
     difDB = p_origen[3] - p_origen[1]
-
-    # Ancho y largo
     wAB = np.sqrt(difBA[0]**2 + difBA[1]**2)
     wCD = np.sqrt(difDC[0]**2 + difDC[1]**2)
     hAC = np.sqrt(difCA[0]**2 + difCA[1]**2)
@@ -67,9 +63,6 @@ def rectificar(img, p_origen):
     img_salida = cv2.warpPerspective(img, M, (W, H))
     return img_salida
 
-
-# se fija en elemento [1] de argv. ese es el nombre del
-# archivo a procesar.el elemento[0] es el nombre del programa
 if(len(sys.argv) > 1):
     filename = sys.argv[1]  # guarda el nombre del archivo
 else:
